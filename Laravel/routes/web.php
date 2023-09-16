@@ -14,5 +14,17 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
+});
+
+Route::get('/customer', function () {
+    return view('customer');
+});
+
+Route::get('/customer/{id}', function ($id) {
+    return view('customer', ['id' => $id, 'isEdit' => true]);
+});
+
+Route::get('/nationality', function () {
+    return view("nationality");
 });

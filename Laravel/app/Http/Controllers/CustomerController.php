@@ -157,10 +157,10 @@ class CustomerController extends Controller
             }
 
             // check nationality  exists
-            Nationality::findOrFail($request->input('national_id'));
+            Nationality::findOrFail(['national_id' => $data['national_id']]);
 
             // update customer
-            $customer = Customer::findOrFail($request->input('cst_id'));
+            $customer = Customer::findOrFail($id);
             $customer->update($data);
 
             // update family list
@@ -182,6 +182,77 @@ class CustomerController extends Controller
             return response()->json([
                 "status" => "error",
                 "message" => "nationality not found"
+            ], 404);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => "error",
+                "message" => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get all customers
+     * 
+     */
+    public function getAll()
+    {
+        $data = Customer::all(["cst_id", "cst_name", "cst_dob", "cst_phoneNum", "cst_email", "created_at"]);
+        return response()->json([
+            "status" => "success",
+            "message" => "customers retrieved successfully",
+            "data" => $data
+        ]);
+    }
+
+    /**
+     * Get customer by id
+     * 
+     * @param string $id
+     */
+    public function getById(string $id)
+    {
+        try {
+            $customer = Customer::findOrFail($id);
+            $customer->family_list = $customer->familyList()->get();
+
+            return response()->json([
+                "status" => "success",
+                "message" => "customer retrieved successfully",
+                "data" => $customer
+            ]);
+        } catch (ModelNotFoundException  $e) {
+            return response()->json([
+                "status" => "error",
+                "message" => "customer not found"
+            ], 404);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => "error",
+                "message" => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete customer by id
+     * 
+     * @param string $id
+     */
+    public function delete(string $id)
+    {
+        try {
+            $customer = Customer::findOrFail($id);
+            $customer->delete();
+
+            return response()->json([
+                "status" => "success",
+                "message" => "customer deleted successfully",
+            ]);
+        } catch (ModelNotFoundException  $e) {
+            return response()->json([
+                "status" => "error",
+                "message" => "customer not found"
             ], 404);
         } catch (\Throwable $th) {
             return response()->json([
