@@ -240,8 +240,11 @@
             const national_id = document.getElementById('national_id');
             const family_list = document.getElementById('family_list');
 
-            // remove first child from family_list
-            family_list.removeChild(family_list.firstElementChild);
+            if (data.family_list?.length !== 0) {
+                // remove first child from family_list
+                family_list.removeChild(family_list.firstElementChild);
+            }
+
 
             cst_name.value = data.cst_name;
             cst_dob.value = data.cst_dob;
