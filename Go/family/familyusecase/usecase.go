@@ -16,14 +16,20 @@ func New(repo familydomain.Repository) familydomain.Usecase {
 }
 
 func (u *usecase) GetFamilyByCstID(ctx context.Context, cstID int) (res []familydomain.FamilyResponse, err error) {
-	res, err = u.repo.GetFamilyByCstID(ctx, cstID)
+	resultDB, err := u.repo.GetFamilyByCstID(ctx, cstID)
 	if err != nil {
 		err = fmt.Errorf("familyusecase: error when get family by cst_id: %w", err)
 		return
 	}
 
-	if len(res) == 0 {
+	if len(resultDB) == 0 {
 		res = make([]familydomain.FamilyResponse, 0)
+	}
+
+	for _, v := range resultDB {
+		var family familydomain.FamilyResponse
+		family.FromDB(v)
+		res = append(res, family)
 	}
 
 	return

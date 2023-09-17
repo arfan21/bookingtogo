@@ -1,6 +1,7 @@
 package customerctrl
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -38,7 +39,7 @@ func (c *Controller) GetCustomerById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	resJSON, err := res.MarshalJSON()
+	resJSON, err := json.Marshal(&res)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -48,4 +49,27 @@ func (c *Controller) GetCustomerById(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(resJSON)
 
+}
+
+func (c *Controller) GetCustomerList(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	res, err := c.usecase.GetCustomerList(r.Context())
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	resJSON, err := json.Marshal(&res)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Write(resJSON)
 }

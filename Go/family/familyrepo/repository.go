@@ -16,7 +16,7 @@ func New(db *pgxpool.Pool) familydomain.Repository {
 	return &repository{db: db}
 }
 
-func (r *repository) GetFamilyByCstID(ctx context.Context, cstID int) (res []familydomain.FamilyResponse, err error) {
+func (r *repository) GetFamilyByCstID(ctx context.Context, cstID int) (res []familydomain.Family, err error) {
 	query := `
 		SELECT
 			fl_id,
@@ -38,7 +38,7 @@ func (r *repository) GetFamilyByCstID(ctx context.Context, cstID int) (res []fam
 	defer rows.Close()
 
 	for rows.Next() {
-		var family familydomain.FamilyResponse
+		var family familydomain.Family
 
 		err = rows.Scan(
 			&family.FLId,

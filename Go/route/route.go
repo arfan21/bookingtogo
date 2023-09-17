@@ -27,6 +27,7 @@ func initializeCustomer(r *mux.Router, db *pgxpool.Pool, family familydomain.Use
 	ctrl := customerctrl.New(svc)
 
 	r.HandleFunc("/customer/{id}", ctrl.GetCustomerById).Methods("GET")
+	r.HandleFunc("/customer", ctrl.GetCustomerList).Methods("GET")
 }
 
 func initializeFamily(r *mux.Router, db *pgxpool.Pool) familydomain.Usecase {

@@ -3,7 +3,6 @@ package customerrepo
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/arfan21/bookingtogo/customer/customerdomain"
 	"github.com/arfan21/bookingtogo/nationality/nationalitydomain"
@@ -18,7 +17,7 @@ func New(db *pgxpool.Pool) customerdomain.Repository {
 	return &repository{db: db}
 }
 
-func (r *repository) GetCustomerById(ctx context.Context, id int) (res customerdomain.CustomerResponse, err error) {
+func (r *repository) GetCustomerById(ctx context.Context, id int) (res customerdomain.Customer, err error) {
 	query := `SELECT
 		customer.cst_id,
 		cst_name,
@@ -54,8 +53,6 @@ func (r *repository) GetCustomerById(ctx context.Context, id int) (res customerd
 			&nationality.NationalCode,
 		)
 
-		log.Println(res)
-
 		if err != nil {
 			err = fmt.Errorf("db: error when scan get customer by id: %w", err)
 			return
@@ -70,4 +67,48 @@ func (r *repository) GetCustomerById(ctx context.Context, id int) (res customerd
 	}
 
 	return res, nil
+}
+
+func (r *repository) GetCustomerList(ctx context.Context) (res []customerdomain.Customer, err error) {
+	query := `
+	SELECT
+		customer.cst_id,
+		cst_name,
+		cst_dob,
+		"cst_phoneNum",
+		cst_email
+	FROM
+		customer`
+
+	rows, err := r.db.Query(ctx, query)
+	if err != nil {
+		err = fmt.Errorf("db: error when query get customer list: %w", err)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var customer customerdomain.Customer
+		err = rows.Scan(
+			&customer.CstID,
+			&customer.CstName,
+			&customer.CstDOB,
+			&customer.CstPhoneNum,
+			&customer.CstEmail,
+		)
+
+		if err != nil {
+			err = fmt.Errorf("db: error when scan get customer list: %w", err)
+			return
+		}
+
+		res = append(res, customer)
+	}
+
+	if rows.Err() != nil {
+		err = fmt.Errorf("db: error when rows get customer list: %w", err)
+		return
+	}
+
+	return
 }

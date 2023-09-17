@@ -24,12 +24,30 @@ func (u *usecase) GetCustomerById(ctx context.Context, id int) (res customerdoma
 		return
 	}
 
-	res, err = u.repo.GetCustomerById(ctx, id)
+	dbResult, err := u.repo.GetCustomerById(ctx, id)
 	if err != nil {
 		err = fmt.Errorf("customerusecase: error when get customer by id: %w", err)
 		return
 	}
+
+	res.FromDB(dbResult)
 	res.Family = familyList
+
+	return
+}
+
+func (u *usecase) GetCustomerList(ctx context.Context) (res []customerdomain.CustomerListResponse, err error) {
+	dbResult, err := u.repo.GetCustomerList(ctx)
+	if err != nil {
+		err = fmt.Errorf("customerusecase: error when get customer list: %w", err)
+		return
+	}
+
+	for _, v := range dbResult {
+		var customer customerdomain.CustomerListResponse
+		customer.FromDB(v)
+		res = append(res, customer)
+	}
 
 	return
 }
