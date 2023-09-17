@@ -214,10 +214,7 @@
             }).then(res => {
                 alert(res?.data?.message || "Berhasil mengubah customer");
                 window.location = "/";
-            }).catch(err => {
-                console.log(err?.response);
-                alert(err?.response?.data?.message || err?.message || "Terjadi kesalahan");
-            })
+            }).catch(err => handleFormError(err))
         }
 
     }
@@ -282,6 +279,25 @@
                 window.location = "/";
             }
         })
+    }
+
+    const handleFormError = (err) => {
+        if (err?.response?.status === 400) {
+            let errors = err?.response?.data?.errors || {};
+            let message = "";
+
+            for (const key in errors) {
+                if (Object.hasOwnProperty.call(errors, key)) {
+                    const element = errors[key];
+                    message += element[0] + "\n";
+                }
+            }
+
+
+            alert(message);
+            return;
+        }
+        alert(err?.response?.data?.message || err?.message || "Terjadi kesalahan");
     }
 
     window.onload = () => {
